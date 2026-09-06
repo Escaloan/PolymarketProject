@@ -20,7 +20,7 @@ namespace PolymarketDataPipeline
         {
             Console.WriteLine("Starting Phase 1 ... Collecting Events");
             var events = await EventApiRequest.GetEvents();
-            bool hasDuplicates = events.GroupBy(e => e.event_id).Any(g => g.Count() > 1);
+            bool hasDuplicates = events.GroupBy(e => e.internal_id).Any(g => g.Count() > 1);
 
             if(hasDuplicates)
             {
