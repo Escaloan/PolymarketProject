@@ -88,6 +88,7 @@ namespace PolymarketDataPipeline
         public float exit_price; // Price at which the position was exited relative to the asset held
 
         public bool five_minute_market; // True if the position is part of a 5 minute market
+        public bool fifteen_minute_market; // True if the position is part of a 5 minute market
         public bool asset_outcome; // True for up, false for down
 
         // Trade Dynamics Information
