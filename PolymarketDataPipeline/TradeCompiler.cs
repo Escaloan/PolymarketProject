@@ -31,7 +31,7 @@ namespace PolymarketDataPipeline
         public static List<TradeJson> JsontoTradeJson(string json)
         {
             // Deserialize as a list, not a single object
-            List<TradeJson> trades = JsonSerializer.Deserialize<List<TradeJson>>(json) ?? new List<TradeJson>();
+            List<TradeJson> trades = JsonSerializer.Deserialize<List<TradeJson>>(json, new JsonSerializerOptions { IncludeFields = true }) ?? new List<TradeJson>();
             return trades;
         }
 
@@ -40,7 +40,7 @@ namespace PolymarketDataPipeline
             if (trades.Count == TradeApiRequest.TradePageSize)
             {
                 long finalTimestamp = trades.Last().timestamp;
-                return trades.Where(t => t.timestamp < finalTimestamp).ToList();
+                return trades.Where(t => t.timestamp > finalTimestamp).ToList();
             }
             return trades;
         }

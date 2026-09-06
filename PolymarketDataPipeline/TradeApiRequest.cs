@@ -68,18 +68,23 @@ namespace PolymarketDataPipeline
         // Worker thread that request the Trade data from the API and sends it off for processing
         public static async Task TradeWorker(ChannelReader<Event> reader)
         {
-            var taskList = new List<Task>();
-
-            await foreach(Event ev in reader.ReadAllAsync())
+            try
             {
-                // Get Raw Trades
-                List<TradeJson> rawTrades = await GetTradesForEvent(ev);
+                var taskList = new List<Task>();
 
-                taskList.Add(ProcessTrades(rawTrades, ev));
+                await foreach (Event ev in reader.ReadAllAsync())
+                {
+                    // Get Raw Trades
+                    List<TradeJson> rawTrades = await GetTradesForEvent(ev);
+
+                    taskList.Add(ProcessTrades(rawTrades, ev));
+                }
+                // Await all processing task
+                await Task.WhenAll(taskList);
             }
-
-            // Await all processing task
-            await Task.WhenAll(taskList);
+            catch (Exception ex) {
+                Console.WriteLine($"Trade Worker Failed, {ex.ToString()}");
+            }
         }
 
         // Seperate Function to process trades to avoid messing up TradeWorker's API time
@@ -117,7 +122,6 @@ namespace PolymarketDataPipeline
 
                     if (response.IsSuccessStatusCode)
                     {
-                        attemps = 0;
                         var tradeBatch = TradeCompiler.JsontoTradeJson(await response.Content.ReadAsStringAsync());
                         lastBatchSize = tradeBatch.Count;
                         if (lastBatchSize == TradePageSize)
@@ -125,7 +129,8 @@ namespace PolymarketDataPipeline
                             CurrentTimeCursor = tradeBatch.Last().timestamp;
                         }
 
-                        rawTrades.AddRange(TradeCompiler.RemoveDuplicate(tradeBatch));
+                        rawTrades.AddRange(TradeCompiler.AddMakerTakerData(TradeCompiler.RemoveDuplicate(tradeBatch)));
+                        attemps = 0;
                     }
                     else
                     {

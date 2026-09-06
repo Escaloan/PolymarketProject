@@ -97,8 +97,8 @@ namespace PolymarketDataPipeline
                     market_id = int.Parse(eventJson.markets[0].id),
                     condition_id = eventJson.markets[0].conditionId,
                     last_trade_price = eventJson.markets[0].lastTradePrice,
-                    up_outcome_price = float.Parse(outcomeValues[0]),
-                    down_outcome_price = float.Parse(outcomeValues[1])
+                    up_outcome_price = float.Parse(outcomeValues[0], System.Globalization.CultureInfo.InvariantCulture),
+                    down_outcome_price = float.Parse(outcomeValues[1], System.Globalization.CultureInfo.InvariantCulture)
                 };
 
                 return ev;

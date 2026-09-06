@@ -72,7 +72,7 @@ namespace PolymarketDataPipeline
                 await T; // Delay to avoid hitting rate limits
 
             }
-            while (nextCursor != null && nextCursor != "");
+            while (nextCursor != "");
 
             Console.WriteLine($"Fetched {events.Count} events for series_id {seriesId}");
 
